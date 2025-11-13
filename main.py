@@ -1,11 +1,11 @@
 import random
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 
 from pydantic import Field, validate_call, ValidationError
 from typing import Annotated
-import matplotlib
 matplotlib.use("TkAgg")
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle, Patch
 
 
 def objects_validator(objects: list[dict]):
@@ -19,13 +19,14 @@ def objects_validator(objects: list[dict]):
         if obj["length"] <= 0:
             raise ValueError("Length must be positive number.")
 
+
 def place_object(
         width,
         length,
         plot_width,
         plot_length,
-        restricted_border)\
-        :
+        restricted_border
+):
     x = random.uniform(
         restricted_border,
         plot_width - restricted_border - width
@@ -87,7 +88,6 @@ def objects_locator(
         )
         ax.add_patch(existing_rect)
 
-
     # New objects
     for obj in new_objects:
         if obj["name"] in result["fitting_objects"]:
@@ -103,7 +103,7 @@ def objects_locator(
 
             # Create new objects
             new_rect = plt.Rectangle(
-                (x,y),
+                (x, y),
                 width=obj["width"],
                 height=obj["length"],
                 edgecolor="green",
@@ -122,7 +122,6 @@ def objects_locator(
             )
             ax.add_patch(new_rect)
 
-
     # Create restricted border
     border_rect = plt.Rectangle(
         (restricted_border, restricted_border),
@@ -135,9 +134,21 @@ def objects_locator(
     ax.add_patch(border_rect)
 
     legend_elements = [
-        Patch(facecolor="none", edgecolor="blue", label="Existing objects"),
-        Patch(facecolor="none", edgecolor="green", label="Fitting new objects"),
-        Patch(facecolor="none", edgecolor="red", label="Restricted border"),
+        Patch(
+            facecolor="none",
+            edgecolor="blue",
+            label="Existing objects"
+        ),
+        Patch(
+            facecolor="none",
+            edgecolor="green",
+            label="Fitting new objects"
+        ),
+        Patch(
+            facecolor="none",
+            edgecolor="red",
+            label="Restricted border"
+        ),
     ]
 
     ax.legend(handles=legend_elements, loc="upper right")
@@ -159,16 +170,22 @@ def find_fitting_objects(
     total_area = plot_width * plot_length
     print("Total area:", total_area)
 
-    usable_area = (plot_width - 2 * restricted_border) * (plot_length - 2 * restricted_border)
+    usable_area = ((plot_width - 2 * restricted_border) *
+                   (plot_length - 2 * restricted_border))
     print("Usable area:", usable_area)
 
-    existing_objects_areas = [obj.get("length") * obj.get("width") for obj in existing_objects]
+    existing_objects_areas = [
+        obj.get("length") * obj.get("width") for obj in existing_objects
+    ]
     print("Area of existing objects:", existing_objects_areas)
 
     free_space = round(usable_area - sum(existing_objects_areas), 2)
     print("Free space:", free_space)
 
-    new_objects_areas = {elem.get("name"): (elem.get("width") * elem.get("length")) for elem in new_objects}
+    new_objects_areas = {
+        elem.get("name"): (elem.get("width") * elem.get("length"))
+        for elem in new_objects
+    }
     print("Area for new objects:", new_objects_areas)
 
     result = {
@@ -199,15 +216,19 @@ def find_fitting_objects(
 
     return result
 
+
 if __name__ == "__main__":
-        find_fitting_objects(
-            plot_width=50,
-            plot_length=100,
-            restricted_border=4,
-            existing_objects=[{"width":10, "length":20}, {"width":5,"length":5}],
-            new_objects=[
-                {"name":"Shed","width":10,"length":10},
-                {"name":"Garage","width":20,"length":30},
-                {"name":"Cabin","width":15,"length":15}
-            ]
-        )
+    find_fitting_objects(
+        plot_width=50,
+        plot_length=100,
+        restricted_border=4,
+        existing_objects=[
+            {"width": 10, "length": 20},
+            {"width": 5, "length": 5}
+        ],
+        new_objects=[
+            {"name": "Shed", "width": 10, "length": 10},
+            {"name": "Garage", "width": 20, "length": 30},
+            {"name": "Cabin", "width": 15, "length": 15}
+        ]
+    )
